@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grupo Ponta Negra - 15 Anos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --blue-bg: #14305c;
+            --blue-border: #1a3a6c;
+            --text-light: #ffffff;
+            --accent-color: #f3f4f6;
+            --gold-line: #d1d5db; /* Cor das linhas finas do layout */
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0b1a30; /* Fundo mais escuro fora do card */
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--blue-bg);
+            max-width: 500px;
+            width: 100%;
+            border-radius: 12px;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        /* Borda interna simulando o panfleto */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .logo {
+            width: 90px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle-small {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .years {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 20px auto;
+            width: 80%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .festa-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .festa-subtitle {
+            font-size: 0.85rem;
+            font-weight: 400;
+            margin-bottom: 25px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-box {
+            text-align: left;
+            padding: 0 10px;
+        }
+
+        .info-box:first-child {
+            border-right: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .info-box h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .address {
+            font-size: 0.85rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 30px;
+            padding: 0 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- SESSÃO DO FORMULÁRIO E LISTA --- */
+        .form-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: 'Montserrat', sans-serif;
+            background: rgba(255, 255, 255, 0.9);
+            color: #111827;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ffffff;
+            background: #ffffff;
+        }
+
+        button {
+            width: 100%;
+            background-color: #ffffff;
+            color: var(--blue-bg);
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background-color: #e5e7eb;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .lista-container {
+            text-align: left;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lista-container h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Scrollbar customizada para combinar com o tema */
+        ul::-webkit-scrollbar {
+            width: 6px;
+        }
+        ul::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        ul::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        li {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-nome {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+        }
+
+        .item-comida {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .loading-text {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Você pode substituir o src pela imagem da logo NA caso possua localmente -->
+    <svg class="logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="48" stroke="white" stroke-width="4"/>
+        <circle cx="50" cy="50" r="42" stroke="white" stroke-width="2"/>
+        <path d="M25 70V30L50 60V20" stroke="white" stroke-width="6" stroke-linejoin="round"/>
+        <path d="M75 70V30L50 60" stroke="white" stroke-width="6" stroke-linejoin="round"/>
+        <path d="M40 50H60" stroke="white" stroke-width="6"/>
+    </svg>
+
+    <div class="subtitle-small">NARCÓTICOS ANÔNIMOS<br>A única exigência é o desejo de parar de usar</div>
+    
+    <div class="main-title">GRUPO<br>PONTA NEGRA</div>
+    <div class="years">– 15 ANOS –</div>
+    
+    <div class="subtitle-small">UMA HISTÓRIA BONITA E VOCÊ FAZ PARTE DELA</div>
+
+    <div class="divider"></div>
+
+    <div class="festa-title">– FESTA AMERICANA –</div>
+    <div class="festa-subtitle">CADA UM TRAZ SUA CONTRIBUIÇÃO</div>
+
+    <div class="divider"></div>
+
+    <div class="info-grid">
+        <div class="info-box">
+            <h4>DOMINGO</h4>
+            <p>6 DE SETEMBRO DE 2026</p>
+        </div>
+        <div class="info-box" style="display: flex; align-items: center; gap: 10px;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/>
+            </svg>
+            <div>
+                <h4>18:00</h4>
+                <p>HORAS</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="address">
+        RUA VEREADOR MANOEL CORINGA DE LEMOS, 441<br>VILA DE PONTA NEGRA
+    </div>
+
+    <div class="form-section">
+        <input type="text" id="nomeInput" placeholder="Seu Nome (Ex: Maria S.)" required>
+        <input type="text" id="itemInput" placeholder="O que vai trazer? (Ex: Salgados)" required>
+        <button id="btnAdicionar" onclick="adicionarItem()">Confirmar na Lista</button>
+    </div>
+
+    <div class="lista-container">
+        <h4>ITENS CONFIRMADOS</h4>
+        <ul id="listaItens">
+            <div class="loading-text">Conectando ao banco de dados...</div>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // CONFIGURAÇÃO DO SUPABASE
+    // ==========================================
+    const SUPABASE_URL = 'https://txgmpoyzcfodvnvucnqn.supabase.co'; 
+    const SUPABASE_KEY = 'sb_publishable_fTrETgd_kTKpD9xZgoWAAA_pYjdoYEn'; 
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function carregarLista() {
+        const listaEl = document.getElementById('listaItens');
+        
+        const { data, error } = await supabase
+            .from('itens_festa_ponta_negra')
+            .select('*')
+            .order('created_at', { ascending: true });
+
+        if (error) {
+            console.error(error);
+            listaEl.innerHTML = '<div class="loading-text" style="color: #ef4444;">Erro ao carregar a lista. Verifique as configurações do Supabase.</div>';
+            return;
+        }
+
+        listaEl.innerHTML = ''; 
+        
+        if(data.length === 0) {
+            listaEl.innerHTML = '<div class="loading-text">Nenhum item na lista ainda. Faça sua contribuição!</div>';
+            return;
+        }
+
+        data.forEach(entrada => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="item-info">
+                    <span class="item-nome">${entrada.nome}</span>
+                    <span class="item-comida">${entrada.item}</span>
+                </div>
+                <button class="delete-btn" onclick="removerItem(${entrada.id})" title="Remover item">×</button>
+            `;
+            listaEl.appendChild(li);
+        });
+    }
+
+    async function adicionarItem() {
+        const nome = document.getElementById('nomeInput').value.trim();
+        const item = document.getElementById('itemInput').value.trim();
+        const btn = document.getElementById('btnAdicionar');
+
+        if (!nome || !item) {
+            alert('Por favor, preencha seu nome e a sua contribuição.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = 'SALVANDO...';
+
+        const { error } = await supabase
+            .from('itens_festa_ponta_negra')
+            .insert([{ nome, item }]);
+
+        if (error) {
+            alert('Erro ao salvar no banco de dados.');
+            console.error(error);
+        } else {
+            document.getElementById('nomeInput').value = '';
+            document.getElementById('itemInput').value = '';
+            carregarLista(); 
+        }
+
+        btn.disabled = false;
+        btn.innerText = 'CONFIRMAR NA LISTA';
+    }
+
+    async function removerItem(id) {
+        if (!confirm('Tem certeza que deseja remover este item da lista?')) return;
+
+        const { error } = await supabase
+            .from('itens_festa_ponta_negra')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            alert('Erro ao excluir o item.');
+            console.error(error);
+        } else {
+            carregarLista(); 
+        }
+    }
+
+    window.onload = carregarLista;
+</script>
+
+</body>
+</html>
