@@ -346,46 +346,52 @@
 </div>
 
 <script>
-    // ==========================================
-    // CONFIGURAÇÃO DO SUPABASE
-    // ==========================================
     const SUPABASE_URL = 'https://txgmpoyzcfodvnvucnqn.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4Z21wb3l6Y2ZvZHZudnVjbnFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1OTk0ODgsImV4cCI6MjEwMzE3NTQ4OH0.PjeBHiey6E1yVOmhuLBELIFyiFNS8Q1exoMAsdTjDgI'; 
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // Variável com o nome exato da tabela. 
+    // Se no seu Supabase a tabela se chama apenas "itens_festa", mude aqui!
+    const NOME_TABELA = 'itens_festa_ponta_negra';
+
     async function carregarLista() {
         const listaEl = document.getElementById('listaItens');
         
-        const { data, error } = await supabase
-            .from('itens_festa_ponta_negra')
-            .select('*')
-            .order('created_at', { ascending: true });
+        try {
+            const { data, error } = await supabase
+                .from(NOME_TABELA)
+                .select('*')
+                .order('created_at', { ascending: true });
 
-        if (error) {
-            console.error(error);
-            listaEl.innerHTML = '<div class="loading-text" style="color: #ef4444;">Erro ao carregar a lista. Verifique as configurações do Supabase.</div>';
-            return;
+            if (error) {
+                console.error("Erro detalhado Supabase:", error);
+                listaEl.innerHTML = `<div class="loading-text" style="color: #fca5a5;">Erro RLS/Tabela: ${error.message}</div>`;
+                return;
+            }
+
+            listaEl.innerHTML = ''; 
+            
+            if(!data || data.length === 0) {
+                listaEl.innerHTML = '<div class="loading-text">Nenhum item na lista ainda. Faça sua contribuição!</div>';
+                return;
+            }
+
+            data.forEach(entrada => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="item-info">
+                        <span class="item-nome">${entrada.nome}</span>
+                        <span class="item-comida">${entrada.item}</span>
+                    </div>
+                    <button class="delete-btn" onclick="removerItem(${entrada.id})" title="Remover item">×</button>
+                `;
+                listaEl.appendChild(li);
+            });
+        } catch (err) {
+            console.error("Exceção JS:", err);
+            listaEl.innerHTML = `<div class="loading-text" style="color: #fca5a5;">Falha na conexão de rede ou JS: ${err.message}</div>`;
         }
-
-        listaEl.innerHTML = ''; 
-        
-        if(data.length === 0) {
-            listaEl.innerHTML = '<div class="loading-text">Nenhum item na lista ainda. Faça sua contribuição!</div>';
-            return;
-        }
-
-        data.forEach(entrada => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <div class="item-info">
-                    <span class="item-nome">${entrada.nome}</span>
-                    <span class="item-comida">${entrada.item}</span>
-                </div>
-                <button class="delete-btn" onclick="removerItem(${entrada.id})" title="Remover item">×</button>
-            `;
-            listaEl.appendChild(li);
-        });
     }
 
     async function adicionarItem() {
@@ -401,17 +407,22 @@
         btn.disabled = true;
         btn.innerText = 'SALVANDO...';
 
-        const { error } = await supabase
-            .from('itens_festa_ponta_negra')
-            .insert([{ nome, item }]);
+        try {
+            const { error } = await supabase
+                .from(NOME_TABELA)
+                .insert([{ nome, item }]);
 
-        if (error) {
-            alert('Erro ao salvar no banco de dados.');
-            console.error(error);
-        } else {
-            document.getElementById('nomeInput').value = '';
-            document.getElementById('itemInput').value = '';
-            carregarLista(); 
+            if (error) {
+                alert('Erro ao salvar no banco de dados: ' + error.message);
+                console.error(error);
+            } else {
+                document.getElementById('nomeInput').value = '';
+                document.getElementById('itemInput').value = '';
+                carregarLista(); 
+            }
+        } catch (err) {
+            alert('Falha na comunicação com o servidor.');
+            console.error(err);
         }
 
         btn.disabled = false;
@@ -421,16 +432,21 @@
     async function removerItem(id) {
         if (!confirm('Tem certeza que deseja remover este item da lista?')) return;
 
-        const { error } = await supabase
-            .from('itens_festa_ponta_negra')
-            .delete()
-            .eq('id', id);
+        try {
+            const { error } = await supabase
+                .from(NOME_TABELA)
+                .delete()
+                .eq('id', id);
 
-        if (error) {
-            alert('Erro ao excluir o item.');
-            console.error(error);
-        } else {
-            carregarLista(); 
+            if (error) {
+                alert('Erro ao excluir o item: ' + error.message);
+                console.error(error);
+            } else {
+                carregarLista(); 
+            }
+        } catch (err) {
+            alert('Falha ao remover item.');
+            console.error(err);
         }
     }
 
