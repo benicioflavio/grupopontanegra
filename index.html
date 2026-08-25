@@ -349,17 +349,16 @@
     const SUPABASE_URL = 'https://txgmpoyzcfodvnvucnqn.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4Z21wb3l6Y2ZvZHZudnVjbnFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1OTk0ODgsImV4cCI6MjEwMzE3NTQ4OH0.PjeBHiey6E1yVOmhuLBELIFyiFNS8Q1exoMAsdTjDgI'; 
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Variável renomeada para supabaseClient para evitar conflito
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Variável com o nome exato da tabela. 
-    // Se no seu Supabase a tabela se chama apenas "itens_festa", mude aqui!
     const NOME_TABELA = 'itens_festa_ponta_negra';
 
     async function carregarLista() {
         const listaEl = document.getElementById('listaItens');
         
         try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from(NOME_TABELA)
                 .select('*')
                 .order('created_at', { ascending: true });
@@ -408,7 +407,7 @@
         btn.innerText = 'SALVANDO...';
 
         try {
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from(NOME_TABELA)
                 .insert([{ nome, item }]);
 
@@ -433,7 +432,7 @@
         if (!confirm('Tem certeza que deseja remover este item da lista?')) return;
 
         try {
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from(NOME_TABELA)
                 .delete()
                 .eq('id', id);
